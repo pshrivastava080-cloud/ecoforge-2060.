@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EcoForge 2060 — Interactive Exploded Model</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#030506;color:#fff;font-family:Arial,sans-serif}
+body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(#00d9ff08 1px,transparent 1px),linear-gradient(90deg,#00d9ff08 1px,transparent 1px);background-size:40px 40px}
+nav{position:fixed;top:0;width:100%;z-index:10;padding:18px 5%;display:flex;justify-content:space-between;background:#030506dd;backdrop-filter:blur(12px);border-bottom:1px solid #173b44}
+.logo{font-weight:900;letter-spacing:3px}.logo span,.label{color:#00eaff}.nav-status{color:#00ff9d;font-size:12px}
+main{padding-top:70px}.hero{min-height:55vh;display:grid;place-items:center;text-align:center;padding:80px 20px 40px}.small{color:#00eaff;letter-spacing:4px;font-size:12px}.hero h1{font-size:clamp(60px,12vw,150px);line-height:.8;letter-spacing:-7px;margin:25px 0}.hero h1 span{color:#00eaff}.hero p{color:#8fa3aa;max-width:700px;line-height:1.7;margin:auto}
+button{padding:13px 20px;margin:7px;color:#00eaff;background:#061116;border:1px solid #00eaff;border-radius:8px;cursor:pointer}button:hover{background:#00eaff;color:#001014}button.green{border-color:#00ff9d;color:#00ff9d}.green:hover{background:#00ff9d;color:#00140d}
+.exhibition{padding:40px 5% 80px}.exhibition-title{max-width:1400px;margin:auto auto 20px}.exhibition-title h2{font-size:clamp(35px,6vw,70px);margin:10px 0}.exhibition-title p{color:#8fa3aa;max-width:850px;line-height:1.7}
+.control{max-width:1400px;margin:auto;display:grid;grid-template-columns:1fr 350px;gap:20px}.viewport{position:relative;min-height:680px;border:1px solid #19414b;border-radius:25px;background:radial-gradient(circle,#07333e,#030708 65%);overflow:hidden}.viewport:before{content:"3D EXPLODED VIEW";position:absolute;top:20px;left:25px;color:#38565e;letter-spacing:3px;font-size:11px}
+.model{position:absolute;width:700px;height:500px;left:50%;top:50%;transform:translate(-50%,-50%) scale(.85);transition:1s}.floor{position:absolute;left:10%;right:10%;bottom:55px;height:2px;background:#00eaff33}
+.component{position:absolute;width:180px;height:95px;left:50%;top:50%;transform:translate(-50%,-50%);border:2px solid #49636b;border-radius:14px;background:linear-gradient(145deg,#101c20,#050a0c);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform 1s,box-shadow .4s,border-color .4s,opacity .5s}.component:hover{border-color:#00eaff}.component.active{border-color:#00ff9d;box-shadow:0 0 35px #00ff9d66;z-index:5}.model.exploded .component{transform:translate(-50%,-50%) translate(var(--x),var(--y))}.model.focused .component:not(.active){opacity:.22}
+#intake{--x:-250px;--y:-150px}#cyclone{--x:0;--y:-180px}#filter{--x:250px;--y:-150px}#carbon{--x:-250px;--y:100px}#co2{--x:0;--y:160px}#reactor{--x:250px;--y:100px}
+.component-name{font-weight:bold;font-size:13px;margin-top:8px}.component-type{color:#72888e;font-size:10px;margin-top:4px}
+.fan{width:55px;height:55px;border:3px solid #00eaff;border-radius:50%;position:relative;animation:spin 1s linear infinite}.fan:before,.fan:after{content:"";position:absolute;width:7px;height:40px;background:#00eaff;left:21px;top:5px;border-radius:5px}.fan:after{transform:rotate(90deg)}@keyframes spin{to{transform:rotate(360deg)}}
+.cycloneIcon{width:60px;height:60px;border:3px solid #b8c4c7;border-radius:50% 50% 30% 30%;position:relative}.cycloneIcon:after{content:"";position:absolute;width:25px;height:25px;border:2px solid #00eaff;border-radius:50%;left:14px;top:14px;animation:spin 1.5s linear infinite}
+.filterIcon{width:70px}.filterIcon i{display:block;height:7px;margin:6px;background:#e7edef;border-radius:5px}.carbonIcon{width:65px;height:60px;border:2px solid #aaa;background:radial-gradient(circle,#222 3px,transparent 4px);background-size:13px 13px}.co2Icon{width:65px;height:65px;border:2px dashed #00eaff;border-radius:50%;position:relative}.co2Icon i{position:absolute;width:12px;height:12px;border-radius:50%;background:#00eaff;box-shadow:0 0 12px #00eaff}.co2Icon i:nth-child(1){left:10px;top:15px}.co2Icon i:nth-child(2){left:30px;top:35px}.co2Icon i:nth-child(3){left:43px;top:12px}.reactorIcon{width:65px;height:65px;border:3px solid #00ff9d;border-radius:50%;box-shadow:0 0 25px #00ff9d66;animation:pulse 1.2s infinite alternate}@keyframes pulse{to{box-shadow:0 0 45px #00ff9d}}
+.side{border:1px solid #19414b;border-radius:20px;background:#05090b;padding:25px;min-height:680px}.side h3{font-size:30px;margin:15px 0}.status{display:inline-block;padding:6px 10px;border:1px solid #00ff9d66;border-radius:5px;color:#00ff9d;font-size:10px}.side-text{margin-top:25px;color:#93a6ac;line-height:1.8}.function-box{margin-top:25px;padding:18px;background:#081114;border:1px solid #183840;border-radius:12px}.function-box b{color:#00eaff}.spec{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #122a30;color:#82969c;font-size:12px}.spec strong{color:#fff}.flow{max-width:1400px;margin:25px auto;display:flex;justify-content:center;flex-wrap:wrap;gap:8px;color:#799097}.flow span{border:1px solid #183840;padding:8px 12px;border-radius:7px;font-size:11px}.flow b{color:#00eaff}
+.explain{max-width:1400px;margin:70px auto}.explain h2{font-size:45px}.explain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:25px}.card,.review-wrap{border:1px solid #183840;border-radius:15px;padding:25px;background:#060b0d}.card h4{color:#00eaff;margin-bottom:10px}.card p{color:#899ca2;line-height:1.7}
+.review-section{max-width:1100px;margin:auto;padding:30px 0 100px}.review-wrap{border-radius:20px}.review-title{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap}.review-title h2{font-size:38px;margin:10px 0}.stars,.review-stars{color:#ffd45a}.review-form{display:grid;grid-template-columns:1fr 180px;gap:12px;margin-top:20px}.review-form input,.review-form textarea,.review-form select{width:100%;background:#081114;color:#fff;border:1px solid #23434b;border-radius:8px;padding:12px;font:inherit}.review-form textarea{grid-column:1/-1;min-height:90px}.review-list{display:grid;gap:12px;margin-top:25px}.review{border:1px solid #17363e;background:#071014;border-radius:12px;padding:17px}.review-top{display:flex;justify-content:space-between}.review-date,.review-note{color:#65777d;font-size:11px}.review-text{color:#a2b2b7;line-height:1.6;margin-top:9px}.empty{text-align:center;color:#71858b;padding:20px}
+footer{border-top:1px solid #173840;padding:45px;text-align:center;color:#62777d}footer strong{color:#00eaff}
+@media(max-width:1000px){.control{grid-template-columns:1fr}.viewport{min-height:900px}.model{width:100%;height:750px}.model.exploded .component{transform:translate(-50%,-50%) translate(0,var(--mobile-y))}#intake{--mobile-y:-330px}#cyclone{--mobile-y:-200px}#filter{--mobile-y:-70px}#carbon{--mobile-y:70px}#co2{--mobile-y:200px}#reactor{--mobile-y:330px}.explain-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.component{width:155px}.review-form{grid-template-columns:1fr}.review-form textarea{grid-column:auto}}
+</style>
+</head>
+<body>
+<nav><div class="logo">ECO<span>FORGE</span> 2060</div><div class="nav-status">● INTERACTIVE SYSTEM</div></nav>
+<main>
+<section class="hero"><div><div class="small">BOOST OUR EARTH • CLASS 9 SCIENCE EXHIBITION</div><h1>ECO<span>FORGE</span><br>2060</h1><p>An interactive digital twin of our futuristic environmental resource-recovery machine.</p><button onclick="scrollToModel()">EXPLORE THE MACHINE ↓</button></div></section>
+
+<section class="exhibition" id="explorer">
+<div class="exhibition-title"><div class="label">DIGITAL TWIN / EXPLODED ENGINEERING VIEW</div><h2>Explore Every Component</h2><p>Click <b>EXPLODE MODEL</b>, then select any component to see its purpose, working principle, and whether it is demonstrated in the physical prototype or is a future concept.</p></div>
+<div class="control">
+<div class="viewport"><div class="model" id="model">
+<div class="component" id="intake" onclick="selectPart('intake')"><div class="fan"></div><div class="component-name">AIR INTAKE</div><div class="component-type">REAL COMPONENT</div></div>
+<div class="component" id="cyclone" onclick="selectPart('cyclone')"><div class="cycloneIcon"></div><div class="component-name">CYCLONE</div><div class="component-type">DUST SEPARATION</div></div>
+<div class="component" id="filter" onclick="selectPart('filter')"><div class="filterIcon"><i></i><i></i><i></i><i></i></div><div class="component-name">HEPA FILTER</div><div class="component-type">REAL COMPONENT</div></div>
+<div class="component" id="carbon" onclick="selectPart('carbon')"><div class="carbonIcon"></div><div class="component-name">ACTIVATED CARBON</div><div class="component-type">ADSORPTION</div></div>
+<div class="component" id="co2" onclick="selectPart('co2')"><div class="co2Icon"><i></i><i></i><i></i></div><div class="component-name">CO₂ CAPTURE</div><div class="component-type">FUTURE CONCEPT</div></div>
+<div class="component" id="reactor" onclick="selectPart('reactor')"><div class="reactorIcon"></div><div class="component-name">ECO REACTOR</div><div class="component-type">FUTURE CONCEPT</div></div>
+</div><div class="floor"></div></div>
+
+<aside class="side"><div class="label">COMPONENT ANALYZER</div><h3 id="partTitle">ECOFORGE 2060</h3><span class="status" id="partStatus">SYSTEM READY</span><div class="side-text" id="partDescription">Select a component from the exploded machine to inspect it.</div><div class="function-box"><b>HOW IT WORKS</b><p id="partHow" style="margin-top:10px;color:#9cafb5;line-height:1.7">The selected component's working principle will appear here.</p></div><div style="margin-top:15px"><div class="spec"><span>TYPE</span><strong id="partType">—</strong></div><div class="spec"><span>MODEL ROLE</span><strong id="partRole">—</strong></div><div class="spec"><span>DEMO</span><strong id="partDemo">—</strong></div></div><div style="margin-top:20px"><button onclick="explode()">EXPLODE MODEL</button><button onclick="assemble()">ASSEMBLE</button><button class="green" onclick="autoTour()">▶ AUTO TOUR</button></div></aside>
+</div>
+<div class="flow"><span>POLLUTED AIR</span><b>→</b><span>AIR INTAKE</span><b>→</b><span>CYCLONE</span><b>→</b><span>HEPA</span><b>→</b><span>CARBON</span><b>→</b><span>CO₂</span><b>→</b><span>FUTURE REACTOR</span></div>
+
+<div class="explain"><div class="label">SCIENCE BEHIND ECOFORGE</div><h2>One Machine. Multiple Principles.</h2><div class="explain-grid">
+<div class="card"><h4>01 — FILTRATION</h4><p>Air passes through filter material that can capture suspended particles. The physical model can demonstrate airflow and filtration.</p></div>
+<div class="card"><h4>02 — ADSORPTION</h4><p>Activated carbon has a large surface area and can adsorb certain gases and odor molecules.</p></div>
+<div class="card"><h4>03 — CARBON CAPTURE</h4><p>Advanced sorbents can capture CO₂. This is represented as a future integrated stage.</p></div>
+<div class="card"><h4>04 — RENEWABLE ENERGY</h4><p>Future EcoForge systems could use renewable electricity to power advanced processing technologies.</p></div>
+<div class="card"><h4>05 — RESOURCE RECOVERY</h4><p>The long-term concept is to turn recovered carbon and waste streams into useful materials.</p></div>
+<div class="card"><h4>06 — CIRCULAR ECONOMY</h4><p>The goal is a system where resources are recovered, reused and kept in circulation.</p></div>
+</div></div>
+</section>
+
+<section class="review-section" id="reviews">
+<div class="review-wrap">
+<div class="review-title"><div><div class="label">VISITOR FEEDBACK</div><h2>EcoForge Reviews</h2></div><div><div class="stars">★★★★★</div><span class="review-note" id="reviewCount">0 reviews</span></div></div>
+<form class="review-form" id="reviewForm">
+<input id="reviewName" maxlength="30" placeholder="Your name" required>
+<select id="reviewRating"><option value="5">★★★★★ — Excellent</option><option value="4">★★★★☆ — Very good</option><option value="3">★★★☆☆ — Good</option><option value="2">★★☆☆☆ — Needs improvement</option><option value="1">★☆☆☆☆ — Poor</option></select>
+<textarea id="reviewText" maxlength="300" placeholder="What do you think about EcoForge 2060?" required></textarea>
+<button class="green" type="submit">POST REVIEW</button>
+</form>
+<div class="review-note">Demo mode: reviews are saved on this browser.</div>
+<div class="review-list" id="reviewList"></div>
+</div>
+</section>
+
+<section style="padding:20px 5% 100px"><div style="max-width:1100px;margin:auto;border:1px solid #29444b;border-radius:20px;padding:30px;background:#060b0d"><div class="label">IMPORTANT FOR JUDGES</div><h2 style="margin:15px 0">REAL + FUTURE</h2><p style="color:#92a6ac;line-height:1.8">The physical prototype demonstrates real principles such as airflow, filtration, particle capture and activated-carbon adsorption. The integrated CO₂ conversion and resource-manufacturing stages are honestly presented as a <b style="color:#ffae35">2050–2060 future concept</b>.</p></div></section>
+</main>
+<footer><strong>ECOFORGE 2060</strong><br><br>TURNING TODAY'S POLLUTION INTO TOMORROW'S SOLUTION</footer>
+
+<script>
+const parts={
+intake:["AIR INTAKE FAN","REAL COMPONENT","The intake is the entry point. A fan creates airflow and pulls surrounding air into the machine.","The fan rotates and creates a pressure difference, moving air toward the intake.","DC FAN + AIR DUCT","AIR INPUT","YES — CAN WORK"],
+cyclone:["CYCLONE SEPARATOR","REAL PRINCIPLE","The cyclone stage represents separation of larger dust particles before finer filtration.","A rotating airflow creates centrifugal effects that move heavier particles toward the outer wall.","AIRFLOW SEPARATOR","DUST REMOVAL","CAN BE DEMONSTRATED"],
+filter:["HEPA / FINE FILTER","REAL COMPONENT","This stage represents fine-particle filtration.","Filter fibres can capture particles through mechanisms including interception, diffusion and impaction.","FILTER MEDIA","FINE PARTICLES","YES — CAN WORK"],
+carbon:["ACTIVATED CARBON","REAL PRINCIPLE","Activated carbon provides a high-surface-area material for adsorption of certain gases and odors.","Molecules interact with the carbon surface and can become adsorbed onto it.","ADSORBENT","GAS / ODOR CONTROL","YES — LIMITED"],
+co2:["CO₂ CAPTURE MODULE","FUTURE CONCEPT","This stage represents an advanced carbon-capture system that could selectively remove CO₂.","Future sorbents could selectively bind CO₂ and later release it in concentrated form.","ADVANCED SORBENT","CARBON CAPTURE","CONCEPT ONLY"],
+reactor:["ECOFORGE REACTOR","2050–2060 CONCEPT","The reactor is the futuristic heart of EcoForge and represents a renewable-powered resource-conversion stage.","A future system could process captured carbon through suitable chemical or electrochemical pathways to produce useful materials or chemicals.","FUTURE REACTOR","RESOURCE RECOVERY","CONCEPT ONLY"]
+};
+const model=document.getElementById("model"), title=document.getElementById("partTitle"), status=document.getElementById("partStatus"), description=document.getElementById("partDescription"), how=document.getElementById("partHow"), type=document.getElementById("partType"), role=document.getElementById("partRole"), demo=document.getElementById("partDemo");
+function explode(){model.classList.add("exploded")}
+function assemble(){model.classList.remove("exploded","focused");document.querySelectorAll(".component").forEach(x=>x.classList.remove("active"))}
+let tourTimer;
+function selectPart(id){clearInterval(tourTimer);const d=parts[id];model.classList.add("exploded","focused");document.querySelectorAll(".component").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");title.textContent=d[0];status.textContent=d[1];description.textContent=d[2];how.textContent=d[3];type.textContent=d[4];role.textContent=d[5];demo.textContent=d[6];if(innerWidth<1000)document.querySelector(".side").scrollIntoView({behavior:"smooth",block:"center"})}
+function autoTour(){clearInterval(tourTimer);let i=0;const a=["intake","cyclone","filter","carbon","co2","reactor"];explode();selectPart(a[i]);tourTimer=setInterval(()=>{if(++i>=a.length)return clearInterval(tourTimer);selectPart(a[i])},2500)}
+function scrollToModel(){document.getElementById("explorer").scrollIntoView({behavior:"smooth"})}
+document.addEventListener("keydown",e=>{if(e.key.toLowerCase()=="e")explode();if(e.key.toLowerCase()=="a")assemble();if(e.key.toLowerCase()=="t")autoTour();if(e.key=="Escape")assemble()});
+
+/* REVIEW SYSTEM */
+const KEY="ecoforge2060_reviews_v1", list=document.getElementById("reviewList"), count=document.getElementById("reviewCount");
+function getReviews(){try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return[]}}
+function saveReviews(x){try{localStorage.setItem(KEY,JSON.stringify(x))}catch(e){}}
+function renderReviews(){const rs=getReviews();count.textContent=rs.length+" review"+(rs.length==1?"":"s");list.innerHTML="";if(!rs.length){list.innerHTML='<div class="empty">No reviews yet. Be the first visitor to review EcoForge 2060.</div>';return}rs.slice().reverse().forEach(r=>{const d=document.createElement("div");d.className="review";const stars="★".repeat(r.rating)+"☆".repeat(5-r.rating);d.innerHTML='<div class="review-top"><b>'+escapeHTML(r.name)+'</b><span class="review-date">'+escapeHTML(r.date)+'</span></div><div class="review-stars">'+stars+'</div><div class="review-text">'+escapeHTML(r.text)+'</div>';list.appendChild(d)})}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+document.getElementById("reviewForm").addEventListener("submit",e=>{e.preventDefault();const name=document.getElementById("reviewName").value.trim(),rating=+document.getElementById("reviewRating").value,text=document.getElementById("reviewText").value.trim();if(!name||!text)return;const rs=getReviews();rs.push({name,rating,text,date:new Date().toLocaleDateString()});saveReviews(rs);e.target.reset();renderReviews()});
+renderReviews();
+</script>
+</body>
+</html>
